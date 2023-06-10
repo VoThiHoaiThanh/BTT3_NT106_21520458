@@ -25,27 +25,27 @@ namespace Server
         {
 
         }
-
-        private void Server_Load(object sender, EventArgs e)
+        public void serverThread()
         {
-           
-            Thread  th= new Thread(new ThreadStart(server1));
-            th.Start();
-        }
-        public void server1()
-        {
-            UdpClient udpClient = new UdpClient(11000);
-
-            
+            UdpClient udpClient = new UdpClient(1308);
             while (true)
             {
-                IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
+                IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 1308);
                 Byte[] receiveBytes = udpClient.Receive(ref RemoteIpEndPoint);
-                string returnData = Encoding.ASCII.GetString(receiveBytes);
-                this.Invoke((MethodInvoker)delegate {
-                    lb_Server.Items.Add(RemoteIpEndPoint.Address.ToString() + ":" + returnData.ToString());
-                });
+                string returnData = Encoding.UTF8.GetString(receiveBytes);
+                string mess = RemoteIpEndPoint.Address.ToString() + ":" +
+                 returnData.ToString();
+                lb_Server.Items.Add(mess);
             }
+        }
+        private void Server_Load(object sender, EventArgs e)
+        {
+
+            CheckForIllegalCrossThreadCalls = false;
+            Thread thdUDPServer = new Thread(new ThreadStart(serverThread));
+            thdUDPServer.Start();
+            
+
         }
     }
 }
